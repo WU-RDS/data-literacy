@@ -1,0 +1,205 @@
+---
+title: 'Introduction to the Course'
+subtitle: '[Data Literacy](./index.html)'
+title-slide-attributes: 
+  data-background-image: Graphics/D2.jpg
+author: 
+- Daniel Winkler
+institute: 
+- '[Institute for Retailing & Data Science](https://www.wu.ac.at/retail/)'
+format: 
+    revealjs:
+        theme: [simple, src/rds_theme.scss]
+        logo: Graphics/WU_logo.png
+        footer: "[Data Literacy](./index.html)"
+        height: 1080
+        width: 1920
+        center-title-slide: false
+        center: false
+        progress: false
+        embed-resources: false #true # slower compile -> activate later
+        code-link: true
+        code-overflow: wrap
+        incremental: false
+    # beamer:
+    #     incremental: false
+    #     aspectratio: 169
+    #     center-title-slide: false
+    html:
+        output-file: 00-admin-page.html
+        code-tools:
+            source: repo
+    ipynb:
+        jupyter:
+            kernelspec:
+              display_name: R
+              language: r
+              name: ir
+---
+
+# Welcome to Data Literacy!
+
+## Who am I? 
+
+:::: {.columns}
+
+::: {.column width="60%"}
+
+- I'm Daniel 👋
+- Masters in Economics with major in Mathematics
+- Data-driven research in various fields
+  - Dissertation: What shapes demand in the music industry?
+    - Artist misconduct (#MeToo) increases demand
+    - Identification of playlists important for artist success
+  - Organ donation
+    - Switching from opt-in to opt-out does not increase available organs
+  - Statistical software ([e.g., shrinkDSM](https://cran.r-project.org/web/packages/shrinkDSM/index.html))
+  - Biomarker analysis for cancer research ([e.g., FGF8](https://www.mdpi.com/2073-4409/8/9/1092))
+- Fraud detection for one of the top 5 music markets world-wide
+  - analysis of $\sim 200$ billion datapoints
+
+:::
+::: {.column width="30%"}
+
+::: {.fragment .fade-up}
+![My Rabbit Georgie](Graphics/Georgie.JPG){width=100%}
+:::
+
+:::
+:::: 
+
+## Why am I here?  
+
+:::: {.columns}
+::: {.column width="32%"}
+
+::: {.callout-tip}
+# High-level Goals
+
+::: {.incremental}
+
+- Have fun
+- Gain confidence in analysis
+- Build a solid foundation for current and future data-based projects
+- Learn to transform raw data into (business/economic) insights
+- Provide a safe space for exploration
+
+:::
+:::
+
+:::
+
+::: {.column width="32%"}
+
+::: {.fragment}
+
+::: {.callout-note}
+# Explicit Goals
+
+::: {.incremental}
+
+- Set up a development environment for data-based projects
+  - Use extensible and future-proof tools
+- Get familiar with R, Quarto, and Git
+  - Create a flexible, documented, reproducible, and collaborative workflow
+- Get familiar with concepts to process, visualize, and analyze data
+  - Make conscious decisions about each step
+  - Confidently choose models and methods appropriate for a given situation
+- Gain practical experience through conducting a short data analysis
+- Grading based on engagement
+
+:::
+:::
+:::
+:::
+
+::: {.column width="32%"}
+
+::: {.fragment}
+::: {.callout-warning}
+# Non-goals
+
+- Learn a "recipe" for data analysis
+  - Great for class becaus it's easy
+  - Not useful in practice
+- Provide a formal introduction to statistics/data-science
+  - Requires it's own course
+  - Focus here on intuition
+- Harsh grading
+  - This is an elective :)
+  - Discourages exploration
+
+:::
+
+:::
+:::
+::::
+
+## Why are **you** here? 
+
+::: {.callout-caution appearance="minimal" }
+# 10 minutes 
+
+- Create a name-tag for yourself (preferably A4 so I can read it)
+- Find someone in class you have not yet met
+- Discuss the following questions and take notes of your neighbors answers
+  - Who are you?
+  - What are you interested in?
+  - What constitutes a good learning environment for me?
+  - Have you used R or another statistical software before?
+  - How can I measure my success in the course?
+    - Formulate 3 measures (e.g., I learned how to run linear regression in R for my thesis)
+  - What can Daniel do in each lecture for me to be successful in the course?
+    - Formulate 3 suggestions (e.g., Provide multiple examples for each concept)
+  - What can I do in each lecture to be successful in the course?
+    - Formulate 3 review questions for after the lecture (e.g., Did I ask questions if something was unclear?, Did I party yesterday and showed up hung-over?)
+:::
+
+. . .
+
+**Introduce your neigbor to the class**
+
+## What's next?
+
+::: {.callout-important}
+# Grading
+
+:::: {.columns} 
+::: {.column width="32%"}
+**25% class participation**
+
+- Today: upload 3 suggestions to make your neighbor successful
+- Every lecture: either participate in class directly or upload a short review to [Canvas](https://canvas.wu.ac.at/courses/7281/assignments) after class
+- 10% for each Saturday lecture, 5% for Wednesday
+:::
+::: {.column width="30%"}
+**30% project plan**
+
+- Discussion next Wednesday (2024.03.13)
+- Due next Friday (2024.03.15)
+- Upload to [Canvas](https://canvas.wu.ac.at/courses/7281/assignments) 
+- Includes:
+  - Research question
+  - A dataset that can be used to answer the research question
+  - A target audience
+  - Optionally: a first idea on how to answer the research question
+:::
+::: {.column width="30%"}
+**45% project presentation**
+
+- Presentations on Wednesday 11 days from today (2023.03.20)
+- $\sim 10 min$ per presentation
+- $\sim 5 min$ discussion for paired groups
+- Upload slides to [Canvas](https://canvas.wu.ac.at/courses/7281/assignments) 
+- Includes:
+  - Introduction to the research question
+  - Short literature review
+  - Introduction to the data
+  - Model-free evidence (e.g., visualizations)
+  - Model-based evidence (e.g., regression analysis)
+  - Conclustion & Recommendation
+  - Optional: Short discussion of solutions to challenges faced
+:::
+::::
+
+:::

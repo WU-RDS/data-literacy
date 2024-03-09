@@ -1,0 +1,31 @@
+project:
+  type: website
+
+website:
+  title: "6235 - Data Literacy"
+  repo-url: https://github.com/dwinkler1/dl
+  site-url: https://dwinkler.org/dl
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: 00-admin.qmd
+        text: Introduction to the course
+      - href: 01-introduction_to_r.qmd
+        text: Introduction to R
+      - href: 02-introduction_to_quarto.qmd
+        text: Introduction to Quarto
+      - href: 03-introduction_to_git.qmd
+        text: Introduction to Git
+      - href: 04-data_visualization.qmd
+        text: Principles of Data Visualization
+      - href: 05-causal_modeling.qmd
+        text: Introduction to Causal Modeling
+      - href: 06-predictive_modeling.qmd
+        text: Introduction to Predictive Modeling
+format:
+  html:
+    theme: flatly
+    css: styles.css
+    toc: true
+

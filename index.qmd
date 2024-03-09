@@ -1,0 +1,15 @@
+---
+title: "Welcome!"
+---
+
+This website covers the course [6235 Data Literacy (Summer 2024) at WU Vienna (login required for Canvas)](https://canvas.wu.ac.at/courses/7281) created at the [Institute for Retailing & Data Science](https://www.wu.ac.at/retail/). The main aims of the course are to build a solid foundation for current and future data-based projects and to gain confidence in presenting your analyses through a princpled workflow. This website is updated as more materials are added. The main format of the material is [RevealJS](https://revealjs.com) and links to the slides can be found on the right-hand side of each page. The pages themselves are automatically generated from the same Quarto files. You will learn how this works as part of this course 😊. 
+
+# This course covers
+
+1. [Introduction to the course](00-admin.qmd)
+2. [Introduction to R](01-introduction_to_r.qmd)
+3. Introduction to Quarto
+4. Introduction to Git
+5. [Principles of Data Visualization](04-data_visualization.qmd)
+6. Introduction to Causal Modeling
+7. Introduction to Predictive Modeling
