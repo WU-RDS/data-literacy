@@ -663,6 +663,7 @@ Daniel Winkler
 </ul>
 </div><div class="column" style="width:50%;">
 <p><img data-src="Graphics/xgboost_hyperparameters.png"></p>
+<p><a href="https://www.r-bloggers.com/2024/01/xgboost-tuning-the-hyperparameters-my-secret-2-step-process-in-r/">source</a></p>
 </div>
 </div>
 </section><section id="model-setup" class="slide level2"><h2>Model setup</h2>
@@ -853,7 +854,7 @@ Computational engine: xgboost </code></pre>
 <span id="cb28-8"><a></a>    <span class="fu">mutate</span>(<span class="at">pred =</span> <span class="fu">as.factor</span>(pred)) <span class="sc">|&gt;</span></span>
 <span id="cb28-9"><a></a>    <span class="fu">conf_mat</span>(species, pred) <span class="sc">|&gt;</span></span>
 <span id="cb28-10"><a></a>    <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">'heatmap'</span>) <span class="sc">+</span></span>
-<span id="cb28-11"><a></a>    <span class="fu">scale_fill_continuous_sequential</span>(<span class="st">"Greens"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-11"><a></a>    <span class="fu">scale_fill_continuous_diverging</span>(<span class="st">"Purple-Green"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">

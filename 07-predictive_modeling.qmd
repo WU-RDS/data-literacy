@@ -183,6 +183,8 @@ Metrics::rmse(testing_xy$y, predict(mod.powers.train, testing_xy))
 :::
 ::: {.column width="50%"}
 ![](Graphics/xgboost_hyperparameters.png)
+
+[source](https://www.r-bloggers.com/2024/01/xgboost-tuning-the-hyperparameters-my-secret-2-step-process-in-r/)
 :::
 ::::
 
@@ -311,7 +313,7 @@ penguins |>
     mutate(pred = as.factor(pred)) |>
     conf_mat(species, pred) |>
     autoplot(type = 'heatmap') +
-    scale_fill_continuous_sequential("Greens")
+    scale_fill_continuous_diverging("Purple-Green")
 ```
 
 ## Exercise

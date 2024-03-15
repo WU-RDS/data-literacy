@@ -2,7 +2,11 @@
 title: "Welcome!"
 ---
 
-This website covers the course [6235 Data Literacy (Summer 2024) at WU Vienna (login required for Canvas)](https://canvas.wu.ac.at/courses/7281) created at the [Institute for Retailing & Data Science](https://www.wu.ac.at/retail/). The main aims of the course are to build a solid foundation for current and future data-based projects and to gain confidence in presenting your analyses through a princpled workflow. This website is updated as more materials are added. The main format of the material is [RevealJS](https://revealjs.com) and links to the slides can be found on the right-hand side of each page. The pages themselves are automatically generated from the same Quarto files. You will learn how this works as part of this course 😊. 
+This website covers the course [6235 Data Literacy (Summer 2024) at WU Vienna (login required for Canvas)](https://canvas.wu.ac.at/courses/7281) created at the [Institute for Retailing & Data Science](https://www.wu.ac.at/retail/). The main aims of the course are to build a solid foundation for current and future data-based projects and to gain confidence in presenting your analyses through a principled workflow.
+If you find this course interesting consider joining the [SBWL Handel & Marketing](https://www.wu.ac.at/retail/study/bachelor/) organized by our institute.
+
+
+This website is updated as more materials are added. The main format of the material is [RevealJS](https://revealjs.com) and links to the slides can be found on the right-hand side of each page. The pages themselves are automatically generated from the same Quarto files. You will learn how this works as part of this course 😊. 
 
 # This course covers
 

@@ -495,6 +495,7 @@ window.Quarto = {
 </ul>
 </div><div class="column" style="width:50%;">
 <p><img src="Graphics/xgboost_hyperparameters.png" class="img-fluid"></p>
+<p><a href="https://www.r-bloggers.com/2024/01/xgboost-tuning-the-hyperparameters-my-secret-2-step-process-in-r/">source</a></p>
 </div>
 </div>
 </section>
@@ -536,7 +537,7 @@ window.Quarto = {
 ✖ yardstick::rmse()      masks Metrics::rmse()
 ✖ yardstick::smape()     masks Metrics::smape()
 ✖ recipes::step()        masks stats::step()
-• Use suppressPackageStartupMessages() to eliminate package startup messages</code></pre>
+• Dig deeper into tidy modeling with R at https://www.tmwr.org</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -720,7 +721,7 @@ Computational engine: xgboost </code></pre>
 <span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">pred =</span> <span class="fu">as.factor</span>(pred)) <span class="sc">|&gt;</span></span>
 <span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">conf_mat</span>(species, pred) <span class="sc">|&gt;</span></span>
 <span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">'heatmap'</span>) <span class="sc">+</span></span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_continuous_sequential</span>(<span class="st">"Greens"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_continuous_diverging</span>(<span class="st">"Purple-Green"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Scale for fill is already present.
 Adding another scale for fill, which will replace the existing scale.</code></pre>
