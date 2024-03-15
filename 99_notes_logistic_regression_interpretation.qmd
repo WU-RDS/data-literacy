@@ -1,0 +1,174 @@
+---
+title: "Logistic Regression Interpretation"
+format:
+    html:
+        code-tools:
+            source: repo
+        code-fold: true
+---
+
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(message = FALSE)
+```
+
+# Logistic Regression
+
+We use logistic regression to estimate models in which the outcome (dependent variable) is binary, i.e., either $0$ or $1$. We can construct such outcomes similar to dummy variables using indicator functions (e.g., Song is in top 10 $\rightarrow$ $1$, song is not in top 10 $\rightarrow$ $0$). In using logistic regression we assume the following functional form
+
+$$
+f(\mathbf{X}) = P(y_i = 1) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 * x_{1,i} + \beta_2 * x_{2,i} + ... +\beta_m * x_{m,i})}}
+$$
+
+where $\beta_k$ are the coefficients to be estimated, $x_{k,i}$ is the $k$th variable observed for individual $i$, and $P(y_i=1)$ is the probability of the outcome being $1$ for individual $i$. The non-linear form makes the interpretation of the estimated coefficients more difficult compared to linear regression. We first have to introduce the concept of "odds".
+
+## Odds
+
+![](./Graphics/odds.jpg){fig-align="center"}
+
+Odds\footnote{\url{https://en.wikipedia.org/wiki/Odds}} are the ratio of the number of events that produce the interesting outcome to the number that do not. For example, if you randomly pick a marble from an urn that contains $3$ green, $7$ red, and $20$ blue marbles the odds of picking a blue marble are 
+
+$$
+\frac{20}{3+7} = \frac{20}{10} = \frac{2}{1}
+$$
+
+In other words, if you pick marbles repeatedly (and put the marble back into the urn), you would, on average, pick $2$ blue marbles for every non-blue marble. Analogously we can define odds in terms of probabilties. In this example $2/3$ or $\sim 66.66\%$ of the marbles are blue and $1/3$ or $\sim 33.33\%$ of the marbles are not. The odds can be defined as the ratio of the _probability_ of the interesting event occuring to the _probability_ that it does not. In our case:
+
+$$
+\frac{p_{blue}}{1-p_{blue}} = \frac{0.6666}{0.3333} = \frac{2}{1}
+$$
+
+where $p_{blue}$ is the probability of picking a blue marble.
+
+## Odds in logistic regression
+
+Let's take a look at odds in the model we are estimating. In that case we are interested in the ratio of the probability that the interesting event occurs ($P(y_i=1)$) to the probability that it does not ($P(y_i=0) = 1-P(y_i=1)$). Plugging in to a simplified version of the model above:
+
+$$
+\begin{aligned}
+P(y_i = 1) &= \frac{1}{1 + e^{-(\beta_0 + \beta_1 * x_{i})}}\\
+\frac{P(y_i = 1)}{1-P(y_i = 1)} &= \frac{\frac{1}{1 + e^{-(\beta_0 + \beta_1 * x_{i})}}}{1-\left(\frac{1}{1 + e^{-(\beta_0 + \beta_1 * x_{i})}}\right)}\\
+&= \frac{1}{\left(1 + e^{-(\beta_0 + \beta_1 * x_{i})}\right) * \left(1 - \frac{1}{1 + e^{-(\beta_0 + \beta_1 * x_{i})}}\right)}\\
+&= \frac{1}{1 + e^{-(\beta_0 + \beta_1 * x_{i})} - \frac{1+e^{-(\beta_0 + \beta_1 * x_{i})}}{1+e^{-(\beta_0 + \beta_1 * x_{i})}}}\\
+&= \frac{1}{1 + e^{-(\beta_0 + \beta_1 * x_{i})} - 1 } \\
+&= \frac{1}{e^{-(\beta_0 + \beta_1 * x_{i})}}\\
+\frac{P(y_i = 1)}{1-P(y_i = 1)} &= e^{\beta_0 + \beta_1 * x_i}
+\end{aligned}
+$$
+
+The first takeaway here is that we get a linear expression in terms of the log-odds of the event:
+
+$$
+ln\left(\frac{P(y_i = 1)}{1-P(y_i = 1)}\right) = \beta_0 + \beta_1 * x_i
+$$
+It also gets us closer to interpreting the $\beta_k$ coefficients. Let's see how the odds change as a result of changing $x_i$ by one unit. 
+
+## Odds ratio
+
+An odds ratio\footnote{\url{https://en.wikipedia.org/wiki/Odds_ratio}} is the ratio of the odds of the interesting event given some observed value to the odds of the interesting event in the absence of that value. In our example we could calculate the odds ratio for a situation in which $x_i$ is incremented by one unit vs. a scenario without the increment.
+
+$$
+\begin{aligned}
+OR &= \frac{\left(\frac{P(y_i = 1 | x'_i)}{1-P(y_i = 1|x'_i)}\right)}{\left(\frac{P(y_i = 1 | x_i)}{1-P(y_i = 1|x_i)}\right)}\\
+   &= \frac{e^{\beta_0 + \beta_1 * (x_i + 1)}}{e^{\beta_0 + \beta_1 * x_i}} \\
+   &= e^{\beta_0 + \beta_1 * x_i + \beta_1 * 1} * e^{-\beta_0 - \beta_1 * x_i}\\
+   &= e^{\beta_0 - \beta_0 + \beta_1 * x_i - \beta_1 * x_i + \beta_1}\\
+OR &= e^{\beta_1}
+\end{aligned}
+$$
+
+where $x'_i$ indicates that $x_i$ was increased by one unit. We note that $e^{\beta_1}$ is the ratio of the odds of the interesting event (i.e., $y_i = 1$) in the presence of a one unit increase of $x_i$ and the odds in the absence of the increase (short: the odds ratio).
+
+## Marginal effects
+
+The exponent in the estimated model gives us an indication that the marginal effect $x_i$ on $P(y_i=1)$ could depend on the level of $x_i$ and not be constant as we are used to in linear models. It is easy to show that this is indeed the case. 
+First let $u=1+e^{-\beta_0 -\beta_1 x_i}$ and $v=-\beta_0 -\beta_1 x_i$. 
+
+$$
+\begin{aligned}
+\frac{\delta}{\delta x_i}P(y_i = 1) &= \frac{\delta}{\delta x_i} \frac{1}{1 + e^{-(\beta_0 + \beta_1 * x_{i})}}\\
+\text{by chain rule}\\
+&= \frac{\delta}{\delta u} \frac{1}{u} * \frac{\delta u}{\delta x_i}\\
+&= - \frac{1}{u^2} \frac{\delta}{\delta x_i} 1+e^{-\beta_0 -\beta_1 x_i}\\
+\text{again using chain rule}\\
+&= - \frac{1}{u^2} \frac{\delta}{\delta v} (1 + e^{v}) * \frac{\delta v}{\delta x_i}\\
+&= - \frac{1}{u^2} e^v * (-\beta_1) \\
+\frac{\delta}{\delta x_i}P(y_i = 1) &= \beta_1 \frac{e^{-\beta_0 - \beta_1 x_i}}{\left(1+e^{-\beta_0 -\beta_1 x_i}\right)^2}
+\end{aligned}
+$$
+
+Thus, the marginal effect of $x_i$ on the probability of the interesting event depends not only on $\beta_1$ but also the level of $x_i$ (in the multivariate case it depends on the values of all other $x_{k,i}$ as well. They also remain in the two exponents above). 
+
+For the univariate case with a binary predictor we can easily calculate the odds ratio and the marginal effect by hand:
+
+```{r}
+## Group 'l' has p = 0.2
+## Group 'h' has p = 0.9
+prob_low <- 0.2
+prob_high <- 0.9
+set.seed(1)
+obs <- factor(c(rep('l',5000),rep('h',5000)),
+              levels = c('h', 'l'))
+## Shuffle obs
+obs <- obs[order(runif(length(obs)))]
+## Get true outcome probalities
+probs <- ifelse(obs == 'l', prob_low, prob_high)
+## Draw y from Bernoulli with p = true outcome probability
+df <- data.frame(x = obs, y = rbinom(length(obs),1,probs))
+str(df)
+```
+
+```{r}
+counts <- table(df$y, df$x)
+counts
+## Odds ratio for 1 if in group 'l' vs 'h'
+OR <- (counts['1','l']/counts['0','l']) / (counts['1','h']/counts['0','h'])
+
+mod <- glm(y ~ x, data = df, family = binomial(link = 'logit'))
+summary(mod)
+exp(coef(mod))
+## Odds ratio by hand:
+OR
+
+library(mfx)
+logitmfx(y~x, data = df, atmean = FALSE)
+## Marginal effect by hand
+ptable <- prop.table(table(df$y, df$x),2)
+ptable
+## Change of probability that y = 1 from 'h' to 'l'
+## should be roughly 0.2 - 0.9 = -0.7
+ptable['1','l'] - ptable['1','h'] 
+```
+
+For a more interesting case with a continuous predictor implement the marginal effects formula (for the univariate case) as follows:
+
+```{r}
+#| echo: true
+#| code-fold: false
+mfx_simple <- function(mod,x){
+  beta_0 <- coef(mod)['(Intercept)']
+  beta_1 <- coef(mod)[2]
+  A <- exp(-beta_0 - beta_1 * x)
+  beta_1 * A / (1+A)^2
+}
+```
+
+The following data includes a binary outcome whether an individual had an extramarital affair (`affair_yn`). As a predictor the years the person is already married is used. There are two options to calculate as summary for the marginal effect of another year in marriage on the probability of having an affair. First, one could simply plug in the average number of years married from the sample (default in the `mfx` library)
+
+```{r}
+library(AER)
+data("Affairs")
+Affairs$affair_yn <- Affairs$affairs > 0
+mod <- glm(affair_yn ~ yearsmarried, data = Affairs, family = binomial())
+logitmfx(affair_yn ~ yearsmarried, data = Affairs)
+mfx_simple(mod, mean(Affairs$yearsmarried))
+```
+
+Alternatively we can calculate the marginal effects at each observation and calculate the average of all the effects (`atmean = FALSE`)
+
+```{r}
+logitmfx(affair_yn ~ yearsmarried, data = Affairs, atmean = FALSE)
+mean(mfx_simple(mod, Affairs$yearsmarried))
+```
+

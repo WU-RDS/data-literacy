@@ -8,6 +8,8 @@ author:
 institute: 
 - '[Institute for Retailing & Data Science](https://www.wu.ac.at/retail/)'
 bibliography: src/data_literacy.bib
+nocite: |
+    @franconeriScienceVisualData2021
 format: 
     revealjs:
         theme: [simple, src/rds_theme.scss]
@@ -24,7 +26,7 @@ format:
         code-overflow: wrap
         code-fold: true
         incremental: false
-        toc: true
+        toc: false
         toc-expand: 1
         toc-depth: 1
         toc-location: body
@@ -36,7 +38,9 @@ format:
     #     aspectratio: 169
     #     center-title-slide: false
     html:
-        output-file: 04-data_visualization-page.html
+        output-file: 04-data_visualization_website.html
+        message: false
+        warning: false
         code-tools:
             source: repo
         code-fold: true
@@ -48,7 +52,6 @@ format:
               name: ir
 ---
 
-
 # Always Visualize!
 
 ## Processing numbers is hard {.scrollable}
@@ -57,6 +60,7 @@ format:
 ::: {.content-visible unless-format="pdf"}
 
 ```{r}
+#| message: false
 library(datasauRus)
 library(dplyr)
 library(ggplot2)
@@ -166,7 +170,7 @@ datasaurus_dozen |>
 
 ## Exercise 
 
-::: {.callout-tip}
+::: {.callout-caution appearance="minimal"}
 ## See beyond summary statistics
 
 - Select the `dataset`s `x_shape` & `bullseye` from the data.frame `datasaurus_dozen`
@@ -197,6 +201,65 @@ filter(datasaurus_dozen, dataset %in% c('x_shape', 'bullseye')) |>
 
 # Visual Channels
 
+## Visualizing different magnitudes
+
+- We can express the comparison of numbers in multiple ways
+- Some representations can be interpreted (by humans) more accurately
+- According to @franconeriScienceVisualData2021 from most to least accurate:
+  - Position
+  - Length
+  - Area
+  - Angle
+  - Intensity
+
+## Visualizing "sameness"
+
+![](Graphics/GestaltPrinciples.png)
+
+## Caution: these can create spurious interpretations
+
+```{r}
+#| fig-width: 18
+#| fig-height: 9
+#| fig-align: center
+related_data <- data.frame(
+  x = c(rnorm(100, 0, 0.1), rnorm(100, 0.5, 0.1)), 
+  y = c(rnorm(100, 0, 0.1), rnorm(100, 0.5, 0.1)))
+ggplot(related_data, aes(x = x , y = y)) +
+  geom_point(size = 1.2) +
+
+  theme_minimal() +
+  theme(
+    plot.title=element_text(size=35),
+    axis.ticks.x=element_blank(),
+    axis.text=element_text(size=30),
+    axis.title=element_text(size=30)
+  )
+```
+
+## Counteract by using another principle
+
+```{r}
+#| fig-width: 18
+#| fig-height: 9
+#| fig-align: center
+related_data$g <- as.factor(ifelse(rbinom(200, 1, prob = 0.5) == 1, 'F', 'M'))
+ggplot(related_data, aes(x = x , y = y, color = g, shape = g)) +
+  geom_point(size = 4) +
+  guides(colour = guide_legend(override.aes = list(size=7))) +
+  theme_minimal() +
+  theme(
+    plot.title=element_text(size=35),
+    axis.ticks.x=element_blank(),
+    axis.text=element_text(size=30),
+    axis.title=element_text(size=30),
+    legend.title = element_blank(),
+    legend.position = 'top',
+    legend.text = element_text(size = 25)
+  )
+```
+
+
 ## Position is interpreted most accurately
 
 - Common y-axis alignment allows for accurate interpretation
@@ -223,6 +286,7 @@ ggplot(penguins, aes(x = fct_revfreq(species))) +
   theme_bw() +
     theme(
     plot.title=element_text(size=35),
+    legend.text=element_text(size=25),
     axis.ticks.x=element_blank(),
     axis.text=element_text(size=30),
     axis.title=element_text(size=30)
@@ -291,19 +355,154 @@ ggplot(penguins, aes(x = fct_revfreq(species), color = sex, fill = sex)) +
   )
 ```
 
+## Using pre-attentive attributes
+
+:::: {.columns}
+::: {.column}
+- Action potentials are means of communication between neurons in the brain
+- The probability of firing depends on the strength of the stimulus
+- The strength of the stimulus is relative to the background
+- All or nothing process
+  - Once the threshold is exceeded the neuron fires
+- Takeaway for visualization:
+  - **Most important information needs to be "highlighted" relativ to all other information**
+:::
+::: {.column}
+![](Graphics/action_potential.png){width="100%"}
+:::
+::::
+
+## How many "b"s are there?
+
+- top-down attention: deliberate & slow
+
+```{r}
+#| fig-width: 12
+#| fig-heigt: 4
+#| fig-align: center
+#| dpi: 600
+set.seed(1)
+xy = expand.grid(seq(0,1, length.out = 5), seq(0,1, length.out = 5))
+text = sample(c("a", "b", "c", "d", "e"), 25, replace = TRUE)
+par(mar = c(0.1,0,0,0))
+plot(c(0, 1), c(0, 1), ann = F, bty = 'n',type = 'n', xaxt = 'n', yaxt = 'n')
+text(xy[,1], xy[,2], text, cex = 3)
+```
+
+## How many "b"s are there?
+
+- bottom-up attention: unconscious & fast
+
+```{r}
+#| fig-align: center
+#| fig-width: 12
+#| fig-heigt: 4
+#| dpi: 600
+par(mar = c(0,0,0,0))
+plot(c(0, 1), c(0, 1), ann = F, bty = 'n',type = 'n',  xaxt = 'n', yaxt = 'n')
+text(xy[,1], xy[,2], text, cex = 3, col = ifelse(text == "b", "black", "gray"))
+```
+
+## How many "ш"s are there?
+
+```{r}
+#| fig-width: 12
+#| fig-heigt: 4
+#| dpi: 600
+par(mar = c(0,0,0,0))
+text_cyr <- sample(c("ш", "ц", "ж", "є", "ґ"), 25, replace = TRUE)
+plot(c(0, 1), c(0, 1), ann = F, bty = 'n',type = 'n',  xaxt = 'n', yaxt = 'n')
+text(xy[,1], xy[,2], text_cyr, cex = 3, col = ifelse(text_cyr == "ш", "black", "gray"))
+```
+
+## Areas can be useful to add a third (least important) variable
+
+```{r}
+#| fig-width: 18
+#| fig-height: 9
+#| fig-align: center
+library(gapminder)
+library(dplyr)
+library(scales)
+gm_last <- gapminder |>
+  group_by(country) |>
+  slice_max(year) |>
+  mutate(hl = as.factor(ifelse(country %in% c("China", "United States"), country, 'other')))
+ggplot(gm_last, aes(y = lifeExp, x = gdpPercap, size = pop, color = hl)) +
+  geom_point() +
+  scale_size(
+    name = "Population",
+    labels = label_number(scale_cut = cut_short_scale()),
+    ) +
+  geom_text(
+    aes(label = country, x = gdpPercap, y = lifeExp),
+    data = filter(gm_last, country %in% c('China', 'United States')),
+    hjust = c(-0.1, 0.5),
+    vjust = c(4, 2),
+    size = 12
+    ) +
+  geom_segment(
+  aes(
+    x = gdpPercap + c(200, 0), 
+    y = lifeExp - 1, 
+    xend = gdpPercap+c(1000, 0), 
+    yend = lifeExp-c(5.5, 2)),
+  data = filter(gm_last, country %in% c('China', 'United States')),
+  size = 0.5
+  ) +
+  scale_x_continuous(labels = label_comma()) +
+  scale_color_manual(values = c('gray20', 'red', 'darkblue')) +
+  guides(colour = 'none') +
+  labs(y = "Life Expectancy", x = "GDP/Capita") +
+  theme_bw() +
+    theme(
+    plot.title=element_text(size=35),
+    axis.ticks.x=element_blank(),
+    axis.text=element_text(size=30),
+    axis.title=element_text(size=30),
+    legend.position='top',
+    legend.text=element_text(size=25),
+    legend.title=element_text(size=25)
+  )
+```
+
+## Do not use pie-charts... just don't
+
+```{r}
+#| fig-width: 18
+#| fig-height: 9
+#| fig-align: center
+penguins |>
+  group_by(species) |>
+  summarize(count = n()) |>
+ggplot(aes(x = "", y = count, fill = species)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Number of observations by species",
+    ) +
+  theme_bw() +
+    theme(
+    plot.title=element_text(size=35),
+    axis.ticks=element_blank(),
+    axis.text=element_blank(),
+    axis.title=element_blank(),
+    legend.position='top',
+    legend.text=element_text(size=25),
+    legend.title=element_blank()
+  ) +
+  coord_polar("y", start=0) 
+```
 
 ## Exercise 
 
-::: {.callout-tip}
+::: {.callout-caution appearance="minimal"}
 ## Perceptual accuracy
 
-- 
-- Create a table showing the following statistics for the two `dataset`s:
-  - mean of `x` and `y`,
-  - standard deviation of `x` and `y`, and
-  - covariance between `x` and `y`
-- Create a plot showing the two `dataset`s
+- Create a graph that shows the population of penguins for the different species per island
+- It is of particular interest which species is the most common on each island
+- Create another graph that shows the analysis separately for the two sexes
 :::
+
 
 ## Visualizing many categories (badly!)
 
@@ -344,6 +543,7 @@ ggplot(data.frame(abb = state.abb, area = state.area), aes(x = abb, y = area)) +
 #| fig-height: 14
 #| fig-align: center
 library(colorspace)
+library(forcats)
 state_areas <- data.frame(abb = state.abb, area = state.area, name = state.name) |>
   mutate(abb = fct_reorder(abb, area))
 ggplot(state_areas, aes(x = abb, y = area, 
@@ -392,7 +592,7 @@ ggplot(usa) +
   scale_color_manual(values = c('gray20', 'red')) +
   guides(color = 'none') + 
   ggthemes::theme_map() +
-  scale_fill_continuous_sequential(
+  scale_fill_binned_sequential(
     palette = "Heat", 
     labels = label_comma(suffix = " sq mi") 
     )
@@ -427,7 +627,15 @@ ggplot(st_crop(eu0, eu0_box))+
   ggthemes::theme_map(base_size = 12) 
 ```
 
+## Exercise
 
+::: {.callout-caution appearance="minimal"}
+## Geospacial data
+
+- Obtain the shape ("SHP") file for the EU + candidates from [Eurostat](https://ec.europa.eu/eurostat/web/gisco/geodata/reference-data/administrative-units-statistical-units/nuts)
+- Crop the data to exclude overseas territories
+- Highlight the "DACH" region
+:::
 
 ## "Connectedness" helps connecting the dots
 
@@ -492,6 +700,27 @@ charts |>
 
 ## Use scatter plots to show correlation
 
+```{r}
+#| fig-width: 24
+#| fig-height: 12
+#| fig-align: center
+penguins |>
+ggplot(aes(x = bill_length_mm, y = bill_depth_mm, #color = species
+)) +
+    geom_point(size = 4) +
+    geom_smooth(method = 'lm', se = FALSE) +
+    guides(colour = guide_legend(override.aes = list(size=7))) +
+    theme_classic() +
+    labs(y = "Bill depth", x = "Bill length") +
+    theme(
+        axis.text=element_text(size=35),
+        axis.title=element_text(size=35),
+    )
+```
+
+## Beware of "Simpson's Paradox"
+
+- When between-group correlation is the opposite of within-group correlation
 
 ```{r}
 #| fig-width: 24
@@ -513,6 +742,7 @@ ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
     )
 ```
 
+
 ## Use Boxplots to show distributions
 
 
@@ -521,9 +751,10 @@ ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
 #| fig-height: 12
 #| fig-align: center
 penguins |>
-ggplot(aes(y = bill_length_mm, x = fct_reorder(species, bill_length_mm, .fun = median))) +
-    geom_boxplot() +
-    guides(colour = guide_legend(override.aes = list(size=7))) +
+ggplot(aes(
+  y = bill_length_mm, 
+  x = fct_reorder(species, bill_length_mm, .fun = median, .na_rm = TRUE))) +
+    geom_boxplot(na.rm = TRUE) +
     theme_classic() +
     labs(y = "Bill length") +
     theme(
@@ -536,3 +767,89 @@ ggplot(aes(y = bill_length_mm, x = fct_reorder(species, bill_length_mm, .fun = m
     )
 ```
 
+## A few notes on colors
+
+- The `library(colorspace)` has convenient functions for [picking correct color patterns](https://colorspace.r-forge.r-project.org/articles/ggplot2_color_scales.html)
+- Palette type depends on the scaling of the data visualized
+  - Is the data discrete or continuous?
+  - Is there an ordering?
+    - Is the ordering diverging (i.e., there is a neutral state)?
+- There are convenience functions for `ggplot`
+
+> scale_<aesthetic>_<datatype>_<colorscale>()
+
+- `aesthetic`s: `fill`, `color`
+- `datatype`s: `discrete`, `continuous`, `binned`
+- `colorscale`s: `qualitative`, `sequential`, `diverging`
+
+## Diverging colors: correlation matrix
+
+- Diverging from -1 to 1 with 0 as a neutral point
+
+```{r}
+#| fig-width: 6
+#| fig-height: 6
+#| fig-align: center
+#| code-fold: false
+corrs <- palmerpenguins::penguins |> 
+  drop_na() |> 
+  select(bill_length_mm, bill_depth_mm, flipper_length_mm) |>
+  cor()
+cor_df <- data.frame(cor = c(corrs), var1 = factor(col(corrs)), var2 = factor(row(corrs)))
+ggplot(cor_df, aes(var1, var2, fill = cor)) + 
+  geom_tile() + 
+  coord_fixed() +
+  ylab("variable") +
+  scale_x_discrete(position = "top", name = "variable") +
+  scale_fill_continuous_diverging("Blue-Red 3")
+```
+
+## Qualitative colors: Unordered groups
+
+- Rule of thumb: visualize up to 7 groups with colors
+- More become hard to differentiate
+
+```{r}
+#| fig-width: 8
+#| fig-height: 8
+#| fig-align: center
+#| code-fold: false
+#| output-location: column 
+ggplot(penguins, 
+  aes(x = fct_revfreq(species), 
+      color = sex, fill = sex)) +
+  geom_bar(stat = "count", position = 'dodge') +
+  scale_fill_discrete_qualitative("pastel 1") +
+  scale_y_continuous(
+    expand = expansion(c(0,0.05)),
+    breaks = seq(10,150, by = 20)) + 
+  labs(
+    title = "Number of observations by species and sex",
+    x = "Penguin Species"
+    ) +
+  theme_bw() +
+    theme(
+    plot.title=element_text(size=35),
+    axis.ticks.x=element_blank(),
+    axis.text=element_text(size=30),
+    axis.title=element_text(size=30),
+    legend.position='top',
+    legend.text=element_text(size=25),
+    legend.title=element_blank()
+  )
+```
+
+## Color Vision Deficiency
+
+- ~8% of men and ~0.5% of women have color vision deficiency (CVD) ("color blindness")
+- We can simulate CVD using `swatchplot(<palette>, cvd = TRUE)`
+
+```{r}
+#| fig-align: center
+#| code-fold: false
+#| output-location: column 
+#| fig-height: 10
+swatchplot(diverging_hcl(7, 'Red-Green'), cvd = TRUE)
+```
+
+## References {.scrollable}

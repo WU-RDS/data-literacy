@@ -1,0 +1,106 @@
+---
+title: 'PACKAGENAME TITLE'
+subtitle: 'My favorite R package!'
+author: 
+- MY NAME 
+affiliation: Vienna University of Economics and Business
+bibliography: data_literacy.bib
+format: 
+    revealjs:
+        theme: [simple]
+        logo: PACKAGE_LOGO.png 
+        footer: "[PACKAGENAME FOOTER](LINK TO PACKAGE PAGE)"
+        height: 1080
+        width: 1920
+        center-title-slide: false
+        center: false
+        progress: false
+        embed-resources: false #true # slower compile -> activate later
+        code-link: true
+        code-overflow: wrap
+        incremental: false
+        toc: true
+        toc-depth: 1
+    docx: default
+---
+
+## Some Hints: Citing {.smaller .scrollable} 
+
+- In order to cite a package you can use the [BibTex format](https://www.bibtex.com/g/bibtex-format/). A sample file is provided together with this file. You can get a bibtex entry for an R package using
+
+
+```{r}
+#| echo: true
+#| eval: false
+print(citation("PACKAGENAME"), bibtex=TRUE)
+```
+
+e.g.,
+
+```{r}
+#| echo: true
+print(citation("shrinkDSM"), bibtex=TRUE)
+```
+
+- Typically you have to specify the citation key (before the first `,`). E.g.,
+
+```
+@Manual{winkler2022shrinkDSM,
+    title = {shrinkDSM: Efficient Bayesian Inference for Dynamic Survival Models with Shrinkage},
+    ...
+}
+```
+- You can [cite in Quarto](https://quarto.org/docs/authoring/footnotes-and-citations.html) using `@citationkey` 
+  - `@zeileis2008partykit` found... $\rightarrow$ @zeileis2008partykit found...
+  - ... has been shown `[@wickham2019tidyverse]`$\rightarrow$ ... has been shown [@wickham2019tidyverse]
+  - ... found in multiple studies `[@wickham2019tidyverse; @zeileis2008partykit]` $\rightarrow$ ... found in multiple studies [@wickham2019tidyverse; @zeileis2008partykit]
+  - ... also in their earlier study `[-@wickham2019tidyverse]` $\rightarrow$ ... also in their earlier study [-@wickham2019tidyverse]
+  - `[see @wickham2019tidyverse, p. 23]` $\rightarrow$ [see @wickham2019tidyverse, p. 23]
+  - `@wickham2019tidyverse [p. 23]` $\rightarrow$ @wickham2019tidyverse [p. 23]
+
+## Some hints: document options
+
+- The code on top of this file surrounded by `---` is called a yaml-header
+  - There you can specify the title, subtitle, author, etc.
+  - It also defines the format of the presentation: [revealJS](https://revealjs.com)
+  - And links to files used to render the presentation (`logo`, `bibliography`)
+  - Feel free to play around with those options (e.g., change some `false` to `true`)
+  - Change the [theme](https://quarto.org/docs/presentations/revealjs/themes.html) if you want to
+
+## Adding figures
+
+- A figure
+- next
+- to
+- a 
+- list
+
+![](georgie.JPG){.absolute bottom=80 right=0 width="400" height="800"}
+
+## Multiple Columns
+
+
+:::: {.columns}
+
+::: {.column width="60%"}
+- Column 1 that is wider than columns 2. Here is some more text to force a line break
+:::
+
+:::{.column width="20%"}
+- Column 2 that is much narrower
+:::
+
+::::
+
+
+
+## References {.scrollable}
+
+- automatically printed on the last slide
+- `{.scrollable}` after the slide header makes the slide scrollable. E.g.,
+
+```
+## References {.scrollable}
+```
+
+### The References

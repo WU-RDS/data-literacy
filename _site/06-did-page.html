@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.545">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Daniel Winkler">
+
+<title>6235 - Data Literacy - Potential Outcomes and DiD</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">6235 - Data Literacy</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./00-admin-page.html"> 
+<span class="menu-text">Introduction to the course</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#motivation-difference-in-differences" id="toc-motivation-difference-in-differences" class="nav-link active" data-scroll-target="#motivation-difference-in-differences">Motivation: Difference-in-Differences</a>
+  <ul class="collapse">
+  <li><a href="#basic-setup" id="toc-basic-setup" class="nav-link" data-scroll-target="#basic-setup">Basic Setup</a></li>
+  <li><a href="#basic-setup-1" id="toc-basic-setup-1" class="nav-link" data-scroll-target="#basic-setup-1">Basic Setup</a></li>
+  <li><a href="#treatment-effect" id="toc-treatment-effect" class="nav-link" data-scroll-target="#treatment-effect">Treatment effect</a>
+  <ul class="collapse">
+  <li><a href="#potential-outcomes-rubincausalinferenceusing2005" id="toc-potential-outcomes-rubincausalinferenceusing2005" class="nav-link" data-scroll-target="#potential-outcomes-rubincausalinferenceusing2005">Potential outcomes <span class="citation" data-cites="rubinCausalInferenceUsing2005">(Rubin 2005)</span></a></li>
+  </ul></li>
+  <li><a href="#treatment-effect-1" id="toc-treatment-effect-1" class="nav-link" data-scroll-target="#treatment-effect-1">Treatment effect</a>
+  <ul class="collapse">
+  <li><a href="#potential-outcomes-rubincausalinferenceusing2005-1" id="toc-potential-outcomes-rubincausalinferenceusing2005-1" class="nav-link" data-scroll-target="#potential-outcomes-rubincausalinferenceusing2005-1">Potential outcomes <span class="citation" data-cites="rubinCausalInferenceUsing2005">(Rubin 2005)</span></a></li>
+  </ul></li>
+  <li><a href="#average-treatment-effect-on-the-treated-tau_g2" id="toc-average-treatment-effect-on-the-treated-tau_g2" class="nav-link" data-scroll-target="#average-treatment-effect-on-the-treated-tau_g2">Average Treatment Effect on the Treated (<span class="math inline">\(\tau_{g=2}\)</span>)</a></li>
+  <li><a href="#introductory-example" id="toc-introductory-example" class="nav-link" data-scroll-target="#introductory-example">Introductory example</a></li>
+  <li><a href="#introductory-example-1" id="toc-introductory-example-1" class="nav-link" data-scroll-target="#introductory-example-1">Introductory example</a></li>
+  <li><a href="#canonical-estimation" id="toc-canonical-estimation" class="nav-link" data-scroll-target="#canonical-estimation">Canonical estimation</a>
+  <ul class="collapse">
+  <li><a href="#two-way-fixed-effects" id="toc-two-way-fixed-effects" class="nav-link" data-scroll-target="#two-way-fixed-effects">Two-Way Fixed Effects</a></li>
+  <li><a href="#dummy-model" id="toc-dummy-model" class="nav-link" data-scroll-target="#dummy-model">“Dummy” Model</a></li>
+  </ul></li>
+  <li><a href="#estimation-in-r" id="toc-estimation-in-r" class="nav-link" data-scroll-target="#estimation-in-r">Estimation in R</a></li>
+  <li><a href="#extension-to-multiple-time-periods" id="toc-extension-to-multiple-time-periods" class="nav-link" data-scroll-target="#extension-to-multiple-time-periods">Extension to Multiple Time Periods</a></li>
+  <li><a href="#two-way-fixed-effects-1" id="toc-two-way-fixed-effects-1" class="nav-link" data-scroll-target="#two-way-fixed-effects-1">Two-Way Fixed Effects?</a></li>
+  <li><a href="#intuition" id="toc-intuition" class="nav-link" data-scroll-target="#intuition">Intuition</a></li>
+  <li><a href="#existing-extensions" id="toc-existing-extensions" class="nav-link" data-scroll-target="#existing-extensions">Existing Extensions</a></li>
+  <li><a href="#implementation-in-r-callawaydifferenceindifferencesmultipletime2021a" id="toc-implementation-in-r-callawaydifferenceindifferencesmultipletime2021a" class="nav-link" data-scroll-target="#implementation-in-r-callawaydifferenceindifferencesmultipletime2021a">Implementation in R <span class="citation" data-cites="callawayDifferenceinDifferencesMultipleTime2021a">(Callaway and Sant’Anna 2021)</span></a></li>
+  <li><a href="#implementation-in-r-callawaydifferenceindifferencesmultipletime2021a-1" id="toc-implementation-in-r-callawaydifferenceindifferencesmultipletime2021a-1" class="nav-link" data-scroll-target="#implementation-in-r-callawaydifferenceindifferencesmultipletime2021a-1">Implementation in R <span class="citation" data-cites="callawayDifferenceinDifferencesMultipleTime2021a">(Callaway and Sant’Anna 2021)</span></a></li>
+  <li><a href="#implementation-in-r-sunestimatingdynamictreatment2021a" id="toc-implementation-in-r-sunestimatingdynamictreatment2021a" class="nav-link" data-scroll-target="#implementation-in-r-sunestimatingdynamictreatment2021a">Implementation in R <span class="citation" data-cites="sunEstimatingDynamicTreatment2021a">(Sun and Abraham 2021)</span></a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="06-did.html"><i class="bi bi-file-slides"></i>RevealJS</a></li><li><a href="06-did.ipynb" download="06-did.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Potential Outcomes and DiD</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button" data-quarto-source-url="https://github.com/dwinkler1/dl/blob/main/06-did.qmd">View Source</a></li></ul></div></div>
+<p class="subtitle lead"><a href="./index.html">Data Literacy</a></p>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Daniel Winkler </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            <a href="https://www.wu.ac.at/retail/">Institute for Retailing &amp; Data Science</a>
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="motivation-difference-in-differences" class="level1">
+<h1>Motivation: Difference-in-Differences</h1>
+<section id="basic-setup" class="level2">
+<h2 class="anchored" data-anchor-id="basic-setup">Basic Setup</h2>
+<ul>
+<li>Two groups
+<ul>
+<li>Countries</li>
+<li>Companies</li>
+<li>Individuals</li>
+<li>etc.</li>
+</ul></li>
+<li>Two periods</li>
+<li>Group <span class="math inline">\(g=2\)</span> receives treatment between period <span class="math inline">\(1\)</span> and <span class="math inline">\(2\)</span></li>
+<li>Group <span class="math inline">\(g=\infty\)</span> never receives the treatment (at least in the observation period)</li>
+<li>No randomization but: “Quasi-Experiment”, “Natural Experiment”</li>
+</ul>
+<p>. . .</p>
+<ul>
+<li><strong>Goal</strong>: identification of a <em>causal average treatment effect on the treated</em> (ATT)</li>
+<li><strong>Core Assumption</strong>: parallel trends</li>
+</ul>
+</section>
+<section id="basic-setup-1" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="basic-setup-1">Basic Setup</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>y_j <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">1.8</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>y_j_counter <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">1.5</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>y_k <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.7</span>, <span class="fl">1.2</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    x, y_k, </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"l"</span>, </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">2</span>),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">xaxt =</span> <span class="st">"n"</span>, <span class="at">yaxt =</span> <span class="st">"n"</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylab =</span> <span class="st">"Y"</span>, <span class="at">xlab =</span> <span class="st">"Period"</span>, </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">bty=</span> <span class="st">"n"</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side=</span><span class="dv">2</span>, <span class="at">labels =</span> <span class="cn">FALSE</span>, <span class="at">at =</span> <span class="cn">NULL</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side=</span><span class="dv">1</span>, <span class="at">at=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>), <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"1"</span>,  <span class="st">"2"</span>))</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, y_j)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>], y_j_counter[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>], <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>), <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="fl">1.8</span>), <span class="at">col =</span> <span class="st">"darkgreen"</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">4</span>, <span class="at">col =</span> <span class="st">"gray30"</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">1.5</span>, <span class="at">y =</span> <span class="fl">0.6</span>, </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="st">"Parallel pre-treatment"</span>, </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">cex=</span><span class="fl">1.5</span>, <span class="at">srt =</span> <span class="dv">17</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">2.2</span>, <span class="at">y =</span> <span class="fl">1.7</span>, </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="st">"Treatment"</span>,</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">cex=</span><span class="fl">1.5</span>, <span class="at">col =</span> <span class="st">"gray30"</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">2.5</span>, <span class="at">y =</span> <span class="fl">1.3</span>, </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="st">"Counterfactual"</span>,</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">srt =</span> <span class="dv">17</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">2.9</span>, <span class="at">y =</span> <span class="fl">1.6</span>,</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="st">"+Effect"</span>,</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="st">"darkgreen"</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="fu">grid</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-did_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="treatment-effect" class="level2">
+<h2 class="anchored" data-anchor-id="treatment-effect">Treatment effect</h2>
+<ul>
+<li><span class="math inline">\(Y_{i,t}\)</span> … outcome of unit <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span></li>
+</ul>
+<section id="potential-outcomes-rubincausalinferenceusing2005" class="level3">
+<h3 class="anchored" data-anchor-id="potential-outcomes-rubincausalinferenceusing2005">Potential outcomes <span class="citation" data-cites="rubinCausalInferenceUsing2005">(<a href="#ref-rubinCausalInferenceUsing2005" role="doc-biblioref">Rubin 2005</a>)</span></h3>
+<div class="incremental">
+<ul class="incremental">
+<li><span class="math inline">\(Y_{i,t}(0)\)</span> … <span class="math inline">\(Y_{i,t}\)</span> given <span class="math inline">\(i\)</span> is <strong>not</strong> treated at <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(Y_{i,t}(1)\)</span> … <span class="math inline">\(Y_{i,t}\)</span> give <span class="math inline">\(i\)</span> is treated at <span class="math inline">\(t\)</span></li>
+<li>Observed: <span class="math inline">\(Y_{i,t} = \mathbb{1}(treated_{i,t}) Y_{i,t}(1) + \left[1 - \mathbb{1}(treated_{i,t})\right] Y_{i,t}(0)\)</span></li>
+<li>Individual treatment effect: <span class="math inline">\(\tau_{i,t} = Y_{i,t}(1) - Y_{i,t}(0)\)</span></li>
+</ul>
+</div>
+</section>
+</section>
+<section id="treatment-effect-1" class="level2">
+<h2 class="anchored" data-anchor-id="treatment-effect-1">Treatment effect</h2>
+<ul>
+<li><span class="math inline">\(Y_{i,t}\)</span> … outcome of unit <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span></li>
+</ul>
+<section id="potential-outcomes-rubincausalinferenceusing2005-1" class="level3">
+<h3 class="anchored" data-anchor-id="potential-outcomes-rubincausalinferenceusing2005-1">Potential outcomes <span class="citation" data-cites="rubinCausalInferenceUsing2005">(<a href="#ref-rubinCausalInferenceUsing2005" role="doc-biblioref">Rubin 2005</a>)</span></h3>
+<ul>
+<li><span class="math inline">\(Y_{i,t}(0)\)</span> … <span class="math inline">\(Y_{i,t}\)</span> given <span class="math inline">\(i\)</span> is not treated at <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(Y_{i,t}(1)\)</span> … <span class="math inline">\(Y_{i,t}\)</span> give <span class="math inline">\(i\)</span> is treated at <span class="math inline">\(t\)</span></li>
+<li>Observed: <span class="math inline">\(Y_{i,t} = \mathbb{1}(treated_{i,t}) Y_{i,t}(1) + \left[1 - \mathbb{1}(treated_{i,t})\right] Y_{i,t}(0)\)</span></li>
+<li>Individual treatment effect: <span class="math inline">\(\tau_{i,t} = Y_{i,t}(1) - Y_{i,t}(0)\)</span></li>
+</ul>
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Group</th>
+<th style="text-align: center;">t = 1</th>
+<th style="text-align: center;">t = 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><span class="math inline">\(g = 2\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(Y_{i,1}(0)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(Y_{i, 2}(1)\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><span class="math inline">\(g = \infty\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(Y_{j,1}(0)\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(Y_{j, 2}(0)\)</span></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="average-treatment-effect-on-the-treated-tau_g2" class="level2">
+<h2 class="anchored" data-anchor-id="average-treatment-effect-on-the-treated-tau_g2">Average Treatment Effect on the Treated (<span class="math inline">\(\tau_{g=2}\)</span>)</h2>
+<ul>
+<li><span class="math inline">\(\bar Y_{g=k, t}\)</span>… average outcome of group <span class="math inline">\(k\)</span> at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(\delta_{g=\cdot}\)</span>… trend of the outcome for <span class="math inline">\(g = \cdot\)</span></li>
+<li><span class="math inline">\(\delta_{g=\cdot} = \delta\)</span> for <span class="math inline">\(g = 2\)</span> and <span class="math inline">\(g = \infty\)</span> under parallel trends</li>
+</ul>
+<p>. . .</p>
+<p><span class="math display">\[
+\begin{aligned}
+\bar Y_{g=2, 2} - \bar Y_{g=2, 1} &amp;= \delta_{g=2} + \tau_{g=2} \\
+\bar Y_{g=2, 2} - \bar Y_{g=2, 1} &amp;=  \bar Y_{g=\infty, 2} - \bar Y_{g=\infty, 1} + \tau_{g=2} \\
+\left[\bar Y_{g=2, 2} - \bar Y_{g=2, 1}\right] - \left[\bar Y_{g=\infty, 2} - \bar Y_{g=\infty, 1}\right] &amp;= \tau_{g=2}
+\end{aligned}
+\]</span></p>
+</section>
+<section id="introductory-example" class="level2">
+<h2 class="anchored" data-anchor-id="introductory-example">Introductory example</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>n_obs <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>units <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span>(n_obs<span class="sc">/</span><span class="dv">2</span>), <span class="at">each =</span> <span class="dv">2</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>unit_fe <span class="ot">&lt;-</span> <span class="fu">runif</span>(n_obs<span class="sc">/</span><span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">20</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>period <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), n_obs<span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>period_fe <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">10</span>), n_obs<span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>treatment <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n_obs<span class="sc">/</span><span class="dv">2</span>, <span class="dv">1</span>, <span class="fl">0.5</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">5</span> <span class="sc">*</span> treatment[units] <span class="sc">*</span> period <span class="sc">+</span> <span class="co"># tau = 5</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    period_fe <span class="sc">+</span> <span class="co"># time fixed effect</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    unit_fe[units] <span class="sc">-</span> <span class="co"># unit fixed effect</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="dv">15</span> <span class="sc">*</span> treatment[units] <span class="sc">+</span> <span class="co"># constant diff treated/untreated</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rnorm</span>(n_obs)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> y, </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">treated =</span> treatment[units], </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">period =</span> period, </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">unit =</span> <span class="fu">as.factor</span>(units))</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>y_j <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(y <span class="sc">~</span> period, data[data<span class="sc">$</span>treated <span class="sc">==</span> <span class="dv">1</span>, ], mean)<span class="sc">$</span>y</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>y_k <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(y <span class="sc">~</span> period, data[data<span class="sc">$</span>treated <span class="sc">==</span> <span class="dv">0</span>, ], mean)<span class="sc">$</span>y</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>delta_y_k <span class="ot">&lt;-</span> <span class="fu">diff</span>(y_k)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>y_k <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    y_k[<span class="dv">1</span>],</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    y_k[<span class="dv">1</span>] <span class="sc">+</span> delta_y_k<span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    y_k[<span class="dv">1</span>] <span class="sc">+</span> delta_y_k)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>y_j <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    y_j[<span class="dv">1</span>],</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    y_j[<span class="dv">1</span>] <span class="sc">+</span> delta_y_k<span class="sc">/</span><span class="dv">2</span>, <span class="co"># assumed</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    y_j[<span class="dv">2</span>])</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>y_j_counter <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    y_j[<span class="dv">1</span>], </span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    y_j[<span class="dv">1</span>] <span class="sc">+</span> delta_y_k<span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    y_j[<span class="dv">1</span>] <span class="sc">+</span> delta_y_k) <span class="co"># assumed</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    y <span class="sc">~</span> </span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">factor</span>(</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>        period, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"t: 1"</span>,<span class="st">"t: 2"</span>)</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">factor</span>(</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>        treated, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), </span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>        <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"D"</span>, <span class="st">"A"</span>)</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>        ), </span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">"Y"</span>,</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">frame.plot =</span> F,</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="st">"white"</span>, <span class="at">sep =</span> <span class="st">" in "</span>,</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">main =</span> <span class="st">"Household income"</span>,</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>    data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-did_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="introductory-example-1" class="level2">
+<h2 class="anchored" data-anchor-id="introductory-example-1">Introductory example</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    x, y_k, </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"l"</span>, </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">35</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">xaxt =</span> <span class="st">"n"</span>, <span class="co">#yaxt = "n",</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylab =</span> <span class="st">"Avg. availabe household income"</span>, <span class="at">xlab =</span> <span class="st">"Period"</span>, </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">bty=</span> <span class="st">"n"</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side=</span><span class="dv">1</span>, <span class="at">at=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>), <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"1"</span>,  <span class="st">"2"</span>))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, y_j)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>], y_j_counter[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>], <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>), <span class="fu">c</span>(y_j[<span class="dv">3</span>], y_j_counter[<span class="dv">3</span>]), <span class="at">col =</span> <span class="st">"darkgreen"</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">4</span>, <span class="at">col =</span> <span class="st">"gray30"</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="at">x =</span> <span class="fl">1.1</span>, <span class="at">y =</span> <span class="dv">31</span>, <span class="at">labels =</span> <span class="st">"D"</span>, <span class="at">cex=</span><span class="fl">1.5</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="at">x =</span> <span class="fl">1.1</span>, <span class="at">y =</span> <span class="dv">16</span>, <span class="at">labels =</span> <span class="st">"A"</span>, <span class="at">cex=</span><span class="fl">1.5</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">1.5</span>, <span class="at">y =</span> <span class="dv">20</span>, </span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="st">"Parallel pre-treatment"</span>, </span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">cex=</span><span class="fl">1.5</span>, <span class="at">srt =</span> <span class="sc">-</span><span class="dv">10</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">2.25</span>, <span class="at">y =</span> <span class="dv">28</span>, </span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="st">"</span><span class="sc">\"</span><span class="st">Klimabonus</span><span class="sc">\"</span><span class="st">"</span>,</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">cex=</span><span class="fl">1.5</span>, <span class="at">col =</span> <span class="st">"gray30"</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">2.5</span>, <span class="at">y =</span> <span class="fl">6.8</span>, </span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="st">"Counterfactual"</span>,</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">srt =</span> <span class="sc">-</span><span class="dv">10</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fl">2.90</span>, <span class="at">y =</span> <span class="fl">7.8</span>,</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="st">"+Effect"</span>,</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="st">"darkgreen"</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="fu">grid</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-did_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="canonical-estimation" class="level2">
+<h2 class="anchored" data-anchor-id="canonical-estimation">Canonical estimation</h2>
+<section id="two-way-fixed-effects" class="level3">
+<h3 class="anchored" data-anchor-id="two-way-fixed-effects">Two-Way Fixed Effects</h3>
+<p><span class="math display">\[
+\begin{aligned}
+y_{i, t} &amp;= \tau_{did}\ \mathbb{1}(\text{treated}_{i, t}) + \gamma_t + \alpha_i + \epsilon_{i,t} \\
+\mathbb{1}(\text{treated}_{i,t}) &amp;\equiv \mathbb{1}(i \in \text{A}) \times \mathbb{1}(t = 2)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="dummy-model" class="level3">
+<h3 class="anchored" data-anchor-id="dummy-model">“Dummy” Model</h3>
+<p><span class="math display">\[
+y_{i, t} = \tau_{did} \mathbb{1}(\text{treated}_{i,t}) + \beta_1 \mathbb{1}(i \in \text{A}) + \beta_2 \mathbb{1}(t = 2) + \alpha + \varepsilon_{i,t}
+\]</span></p>
+<p>Typically <span class="math inline">\(\sigma_{\epsilon_{i,t}} &lt; \sigma_{\varepsilon_{i,t}}\)</span></p>
+</section>
+</section>
+<section id="estimation-in-r" class="level2">
+<h2 class="anchored" data-anchor-id="estimation-in-r">Estimation in R</h2>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fixest)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pander)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">etable</span>(<span class="fu">list</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">TWFE</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">feols</span>(y <span class="sc">~</span> treated<span class="sc">:</span>period <span class="sc">|</span> unit <span class="sc">+</span> period, data),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Dummy</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">feols</span>(y <span class="sc">~</span> treated <span class="sc">*</span> period, data)),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">postprocess.df =</span> pandoc.table.return,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="st">"rmarkdown"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">&nbsp;</th>
+<th style="text-align: center;">TWFE</th>
+<th style="text-align: center;">Dummy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Dependent Var.:</td>
+<td style="text-align: center;">y</td>
+<td style="text-align: center;">y</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">treated x period</td>
+<td style="text-align: center;">5.064*** (0.1266)</td>
+<td style="text-align: center;">5.064*** (0.7296)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Constant</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">29.67*** (0.3648)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">treated</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">-14.56*** (0.5159)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">period</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">-10.03*** (0.5159)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">Fixed-Effects:</td>
+<td style="text-align: center;">—————–</td>
+<td style="text-align: center;">——————</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">unit</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">period</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">No</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">________________</td>
+<td style="text-align: center;">_________________</td>
+<td style="text-align: center;">__________________</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">S.E. type</td>
+<td style="text-align: center;">by: unit</td>
+<td style="text-align: center;">IID</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Observations</td>
+<td style="text-align: center;">1,000</td>
+<td style="text-align: center;">1,000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">R2</td>
+<td style="text-align: center;">0.99413</td>
+<td style="text-align: center;">0.61016</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Within R2</td>
+<td style="text-align: center;">0.76267</td>
+<td style="text-align: center;">–</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="extension-to-multiple-time-periods" class="level2">
+<h2 class="anchored" data-anchor-id="extension-to-multiple-time-periods">Extension to Multiple Time Periods</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>did_data_staggered <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">fread</span>(<span class="st">"https://raw.githubusercontent.com/WU-RDS/RMA2022/main/data/did_data_staggered.csv"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>did_data_staggered<span class="sc">$</span>song_id <span class="ot">&lt;-</span> <span class="fu">as.character</span>(did_data_staggered<span class="sc">$</span>song_id)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>did_data_staggered<span class="sc">$</span>week <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(did_data_staggered<span class="sc">$</span>week)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>did_data_staggered<span class="sc">$</span>week_num <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">factor</span>(</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        did_data_staggered<span class="sc">$</span>week, </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">levels =</span> <span class="fu">sort</span>(<span class="fu">unique</span>(did_data_staggered<span class="sc">$</span>week)), </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">labels =</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(<span class="fu">unique</span>(did_data_staggered<span class="sc">$</span>week))))</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># data preparation</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>treated_ids <span class="ot">&lt;-</span> <span class="fu">unique</span>(did_data_staggered[did_data_staggered<span class="sc">$</span>treated <span class="sc">==</span> <span class="dv">1</span>, ]<span class="sc">$</span>song_id)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>untreated_ids <span class="ot">&lt;-</span> <span class="fu">unique</span>(did_data_staggered[did_data_staggered<span class="sc">$</span>treated <span class="sc">==</span> <span class="dv">0</span>, ]<span class="sc">$</span>song_id)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(panelView)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>## See bit.ly/panelview4r for more info.
+## Report bugs -&gt; yiqingxu@stanford.edu.</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inspect data</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">panelview</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    streams <span class="sc">~</span> treated_post, </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> did_data_staggered[</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        did_data_staggered<span class="sc">$</span>song_id <span class="sc">%in%</span> <span class="fu">c</span>(</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sample</span>(treated_ids,<span class="dv">5</span>), </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">sample</span>(untreated_ids, <span class="dv">3</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">&amp;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        did_data_staggered<span class="sc">$</span>week_num <span class="sc">&gt;</span> <span class="dv">10</span> <span class="sc">&amp;</span> </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        did_data_staggered<span class="sc">$</span>week_num <span class="sc">&lt;=</span> <span class="dv">30</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    , ], </span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">index =</span> <span class="fu">c</span>(<span class="st">"song_id"</span>, <span class="st">"week"</span>), </span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylab =</span> <span class="st">"group"</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">pre.post =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">by.timing =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">theme.bw =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.adjust =</span> <span class="cn">TRUE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="06-did_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="two-way-fixed-effects-1" class="level2">
+<h2 class="anchored" data-anchor-id="two-way-fixed-effects-1">Two-Way Fixed Effects?</h2>
+<p><span class="math display">\[
+y_{i, t} = \tau_{did}\ \mathbb{1}(\text{treated}_{i, t}) + \gamma_t + \alpha_i + \epsilon_{i,t}
+\]</span></p>
+<ul>
+<li><p>Ok <strong>IF</strong> <span class="math display">\[
+\tau_{g, t} = \tau \text{ for all }g \text{ and } t
+\]</span></p></li>
+<li><p>Otherwise: estimate separate <span class="math inline">\(\tau_{g, t}\)</span> for all <span class="math inline">\(g\)</span> and <span class="math inline">\(t\)</span> using only not (yet) treated units as controls</p></li>
+</ul>
+</section>
+<section id="intuition" class="level2">
+<h2 class="anchored" data-anchor-id="intuition">Intuition</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="Graphics/gb_decomp.png" class="img-fluid figure-img"></p>
+<figcaption><span class="citation" data-cites="goodman-baconDifferenceindifferencesVariationTreatment2021c">Goodman-Bacon (<a href="#ref-goodman-baconDifferenceindifferencesVariationTreatment2021c" role="doc-biblioref">2021</a>)</span></figcaption>
+</figure>
+</div>
+</section>
+<section id="existing-extensions" class="level2">
+<h2 class="anchored" data-anchor-id="existing-extensions">Existing Extensions</h2>
+<ul>
+<li>Existing methods for multiple time periods <span class="citation" data-cites="callawayDifferenceinDifferencesMultipleTime2021a">(e.g., <a href="#ref-callawayDifferenceinDifferencesMultipleTime2021a" role="doc-biblioref">Callaway and Sant’Anna 2021</a>)</span> work well if the number of treated units in each group <span class="math inline">\(g\)</span> is “large” (&gt;5)</li>
+<li>Focus on selecting “control group” correctly
+<ul>
+<li>Loop over groups and times and select not (yet) treated as controls <span class="citation" data-cites="callawayDifferenceinDifferencesMultipleTime2021a">(<a href="#ref-callawayDifferenceinDifferencesMultipleTime2021a" role="doc-biblioref">Callaway and Sant’Anna 2021</a>)</span></li>
+<li>Estimate large matrix of indicators <span class="citation" data-cites="sunEstimatingDynamicTreatment2021a">(<a href="#ref-sunEstimatingDynamicTreatment2021a" role="doc-biblioref">Sun and Abraham 2021</a>)</span></li>
+</ul></li>
+<li>Result: <strong>Group Time Average Treatment Effect</strong> <span class="math inline">\(\tau_{g,t}\)</span></li>
+</ul>
+</section>
+<section id="implementation-in-r-callawaydifferenceindifferencesmultipletime2021a" class="level2">
+<h2 class="anchored" data-anchor-id="implementation-in-r-callawaydifferenceindifferencesmultipletime2021a">Implementation in R <span class="citation" data-cites="callawayDifferenceinDifferencesMultipleTime2021a">(<a href="#ref-callawayDifferenceinDifferencesMultipleTime2021a" role="doc-biblioref">Callaway and Sant’Anna 2021</a>)</span></h2>
+<div class="cell" data-layout-align="center" data-warnings="false">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>did_data_staggered<span class="sc">$</span>log_streams <span class="ot">&lt;-</span> <span class="fu">log</span>(did_data_staggered<span class="sc">$</span>streams<span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># add first period treated</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>did_data_staggered_G <span class="ot">&lt;-</span> did_data_staggered <span class="sc">|&gt;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(treated <span class="sc">==</span> <span class="dv">1</span>, week <span class="sc">==</span> treat_week) <span class="sc">|&gt;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(song_id, <span class="at">G =</span> week_num)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>did_data_staggered <span class="ot">&lt;-</span> <span class="fu">left_join</span>(did_data_staggered,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                                did_data_staggered_G,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>                                <span class="at">by =</span> <span class="st">"song_id"</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>did_data_staggered<span class="sc">$</span>G <span class="ot">&lt;-</span> <span class="fu">coalesce</span>(did_data_staggered<span class="sc">$</span>G, <span class="dv">0</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>did_data_staggered<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(did_data_staggered<span class="sc">$</span>song_id)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">#increase bootstrap for reliability!</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(did)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>mod.csa <span class="ot">&lt;-</span> <span class="fu">att_gt</span>(<span class="at">yname =</span> <span class="st">"log_streams"</span>,</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">tname =</span> <span class="st">"week_num"</span>,</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">idname =</span> <span class="st">"id"</span>,</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">gname =</span> <span class="st">"G"</span>,</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">biters =</span> <span class="dv">2000</span>,</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">data =</span> did_data_staggered</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in pre_process_did(yname = yname, tname = tname, idname = idname, : Be aware that there are some small groups in your dataset.
+  Check groups: 15,16,17,18,19,20,22,24,25,26,27.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in att_gt(yname = "log_streams", tname = "week_num", idname = "id", :
+Not returning pre-test Wald statistic due to singular covariance matrix</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggdid</span>(<span class="fu">aggte</span>(mod.csa, <span class="at">type =</span> <span class="st">'dynamic'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="06-did_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="1728"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="implementation-in-r-callawaydifferenceindifferencesmultipletime2021a-1" class="level2">
+<h2 class="anchored" data-anchor-id="implementation-in-r-callawaydifferenceindifferencesmultipletime2021a-1">Implementation in R <span class="citation" data-cites="callawayDifferenceinDifferencesMultipleTime2021a">(<a href="#ref-callawayDifferenceinDifferencesMultipleTime2021a" role="doc-biblioref">Callaway and Sant’Anna 2021</a>)</span></h2>
+<div class="cell" data-layout-align="center" data-warnings="false">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggdid</span>(mod.csa, <span class="at">group =</span> <span class="dv">17</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="06-did_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="1728"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="implementation-in-r-sunestimatingdynamictreatment2021a" class="level2">
+<h2 class="anchored" data-anchor-id="implementation-in-r-sunestimatingdynamictreatment2021a">Implementation in R <span class="citation" data-cites="sunEstimatingDynamicTreatment2021a">(<a href="#ref-sunEstimatingDynamicTreatment2021a" role="doc-biblioref">Sun and Abraham 2021</a>)</span></h2>
+<div class="cell" data-layout-align="center" data-warnings="false">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggiplot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: ggplot2</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mod.sunab <span class="ot">&lt;-</span> <span class="fu">feols</span>(log_streams <span class="sc">~</span> <span class="fu">sunab</span>(G, week_num) <span class="sc">|</span> id <span class="sc">+</span> week_num, <span class="at">data =</span> did_data_staggered )</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggiplot</span>(mod.sunab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="06-did_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="1728"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="references" class="level2">
+
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-callawayDifferenceinDifferencesMultipleTime2021a" class="csl-entry" role="listitem">
+Callaway, Brantly, and Pedro H. C. Sant’Anna. 2021. <span>“Difference-in-Differences with Multiple Time Periods.”</span> <em>Journal of Econometrics</em>, Themed issue: Treatment effect 1, 225 (2): 200–230. <a href="https://doi.org/10.1016/j.jeconom.2020.12.001">https://doi.org/10.1016/j.jeconom.2020.12.001</a>.
+</div>
+<div id="ref-goodman-baconDifferenceindifferencesVariationTreatment2021c" class="csl-entry" role="listitem">
+Goodman-Bacon, Andrew. 2021. <span>“Difference-in-Differences with Variation in Treatment Timing.”</span> <em>Journal of Econometrics</em>, Themed issue: Treatment effect 1, 225 (2): 254–77. <a href="https://doi.org/10.1016/j.jeconom.2021.03.014">https://doi.org/10.1016/j.jeconom.2021.03.014</a>.
+</div>
+<div id="ref-rubinCausalInferenceUsing2005" class="csl-entry" role="listitem">
+Rubin, Donald B. 2005. <span>“Causal Inference Using Potential Outcomes: Design, Modeling, Decisions.”</span> <em>Journal of the American Statistical Association</em> 100 (469): 322–31. <a href="https://www.jstor.org/stable/27590541">https://www.jstor.org/stable/27590541</a>.
+</div>
+<div id="ref-sunEstimatingDynamicTreatment2021a" class="csl-entry" role="listitem">
+Sun, Liyang, and Sarah Abraham. 2021. <span>“Estimating Dynamic Treatment Effects in Event Studies with Heterogeneous Treatment Effects.”</span> <em>Journal of Econometrics</em>, Themed issue: Treatment effect 1, 225 (2): 175–99. <a href="https://doi.org/10.1016/j.jeconom.2020.09.006">https://doi.org/10.1016/j.jeconom.2020.09.006</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

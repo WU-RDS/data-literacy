@@ -1,0 +1,349 @@
+---
+title: 'Predictive Modeling'
+subtitle: '[Data Literacy](./index.html)'
+title-slide-attributes: 
+  data-background-image: Graphics/D2.jpg
+author: 
+- Daniel Winkler
+institute: 
+- '[Institute for Retailing & Data Science](https://www.wu.ac.at/retail/)'
+bibliography: src/data_literacy.bib
+prefer-html: true
+format: 
+    revealjs:
+        theme: [simple, src/rds_theme.scss]
+        logo: Graphics/WU_logo.png
+        footer: "[Data Literacy](./index.html)"
+        height: 1080
+        width: 1920
+        center-title-slide: false
+        center: false
+        progress: false
+        embed-resources: false #true # slower compile -> activate later
+        echo: true
+        code-link: true
+        code-overflow: wrap
+        code-fold: true
+        incremental: false
+        toc: true
+        toc-expand: 1
+        toc-depth: 1
+        toc-location: body
+        fig-width: 12
+        fig-height: 6
+        fig-align: center
+    # beamer:
+    #     incremental: false
+    #     aspectratio: 169
+    #     center-title-slide: false
+    html:
+        output-file: 07-predictive_modeling-page.html
+        code-tools:
+            source: repo
+        code-fold: true
+    # ipynb:
+    #     prefer-html: true
+    #     jupyter:
+    #         kernelspec:
+    #           display_name: R
+    #           language: r
+    #           name: ir
+---
+
+## Predictive modeling
+
+- Not concerned with causal relationship
+  - causal model typically worse in terms of prediction
+- Allows flexible model structure
+- Goal: extrapolate well (small error) to unknown outcome given new observed input
+- Definition of "error" (loss) depends on the outcome variable and problem <br> (e.g., binary $\rightarrow$ sensitivity/specificity, continuous $\rightarrow$ squared/absolute error)
+- Fundamental issue: _overfitting_
+  - Each observed outcome contains _signal_ and _noise_
+  - _signal_: part that is associated with inputs
+  - _noise_: additional variation e.g., measurement error, unobserved factors, random nature of outcome
+    - will be different in new data
+  - _overfitting_: in addition to the _signal_ the model also picks up on the _noise_ of the data used to "fit" (train) the parameters
+
+## Bias-variance tradeoff
+
+![](Graphics/bias_varaince.png){width="100%"}
+[source](https://medium.com/@ivanreznikov/stop-using-the-same-image-in-bias-variance-trade-off-explanation-691997a94a54)
+
+## A first example
+
+```{r}
+#| echo: true
+#| code-fold: false
+#| output-location: column 
+#| output: asis
+library(modelsummary)
+library(Metrics)
+
+set.seed(42)
+x <- runif(1000, -100, 100)
+y <- 12.5 + 7 * x + rnorm(
+    length(x), mean = 0, sd = 1000
+    )
+model_data <- data.frame(x,y)
+mod.ols <- lm(y~x, data = model_data)
+modelsummary(list(OLS = mod.ols), output="markdown")
+```
+
+## Check for overfitting: data prep
+
+- Train/Test split
+  - Use e.g., 80% of the sample to fit the model and 20% to test its performance on new data
+- In real life: do this many times with different splits to see patterns
+
+```{r}
+#| echo: true
+#| code-fold: false
+#| output-location: column 
+library(rsample)
+split_xy <- initial_split(model_data, prop = 0.8)
+training_xy <- training(split_xy)
+testing_xy <- testing(split_xy)
+print("Signal vs. Noise")
+summary(training_xy)
+summary(testing_xy)
+```
+
+## Check for overfitting
+
+- Check for differences in model performance in the training and test samples
+- RMSE: Root Mean Squared Error $\sqrt{\frac{1}{n}\sum_{i=1}^n (y - \hat y)^2}$
+
+```{r}
+#| echo: true
+#| code-fold: false
+#| output-location: column 
+mod.ols.train <- lm(y ~ x, data =  training_xy)
+modelsummary(mod.ols.train, gof_omit = "R2|IC|Log|F")
+Metrics::rmse(training_xy$y, predict(mod.ols.train))
+
+Metrics::rmse(testing_xy$y, predict(mod.ols.train, testing_xy))
+```
+
+## Check for overfitting: $k$-fold Cross-Validation
+
+- Shuffle the data
+  - Very flexible models may learn the data ordering
+- Create $k$ equally sized non-overlapping test splits 
+- run the model $k$ times using a different split as the test set in each run
+- Size of each split $n/k$
+
+![](Graphics/KfoldCV.gif)
+[source](https://upload.wikimedia.org/wikipedia/commons/4/4b/KfoldCV.gif)
+
+## Let's overfit
+
+- Model that includes 25 powers of x (de-correlated)
+- Now RMSE is worse in the test set: the model learned noise of the training data
+```{r}
+#| echo: true
+#| code-fold: false
+mod.powers.train <- lm(y ~ poly(x, degrees = 25), data =  training_xy)
+
+Metrics::rmse(training_xy$y, predict(mod.powers.train))
+
+Metrics::rmse(testing_xy$y, predict(mod.powers.train, testing_xy))
+```
+
+## Real example: Gradient boosting
+
+**XGBoost**
+
+- Flexible non-parametric model
+- Regularization (i.e., shrinkage) of parameters -> variable selection 
+- Regularization of model -> prevent overfitting
+- Scalable algorithm
+
+:::: {.columns}
+::: {.column width="50%"}
+
+![](Graphics/cart.png)
+
+:::
+::: {.column width="50%"}
+
+![](Graphics/twocart.png)
+[source](https://xgboost.readthedocs.io/en/stable/tutorials/model.html)
+:::
+::::
+
+## Avoid Overfitting
+
+:::: {.columns}
+::: {.column width="50%"}
+- Which paramters does the model have that "restrict" the training?
+- Problem:
+  - Too restrictive: underfitting
+  - Too flexible: overfitting
+- Tune parameters to find the reasonable middle
+:::
+::: {.column width="50%"}
+![](Graphics/xgboost_hyperparameters.png)
+:::
+::::
+
+## Model setup
+
+- Multiple ways (e.g., `library(xgboost)`)
+- Here: use `library(tidymodels)`
+  - Same interface to many different models
+
+```{r}
+#| messages: false
+#| code-fold: false
+library(tidymodels)
+library(palmerpenguins)
+mod.boost <- boost_tree(
+    mode   = "classification",
+    engine = "xgboost",
+    learn_rate = tune()
+)
+mod.boost
+```
+
+## Hyperparamter tuning setup
+
+- Run the model multiple times using different values for the learning rate
+- Select the one that performs best
+
+```{r}
+#| echo: true
+#| code-fold: false
+#| output-location: column 
+set.seed(1)
+random_lr <- grid_random(
+    extract_parameter_set_dials(mod.boost), 
+    size = 10)
+random_lr
+```
+
+## Data setup
+
+- Predict the penguin species based on the observed data
+- Numeric features can be used as they are
+- Categorical features have to be encoded into numeric features
+  - most common: one-hot encoding (indicator function)
+  - in this case: `island`, `sex`
+
+```{r}
+#| code-fold: false
+penguins <- drop_na(penguins)
+penguin_dummies <- recipe(species ~ ., penguins) |>
+    step_dummy(all_nominal_predictors(), one_hot = TRUE)
+# see ?step_dummy for other encoding options
+head(penguins)
+```
+
+## Putting the setup together
+
+- Create a `workflow` that combines model and data preprocessing
+- Set up $k$-fold cross-validation
+  - Here $v$-fold for whatever reason but just think $k = v$
+- Tune the learning rate
+
+```{r}
+#| code-fold: false
+#| output-location: column 
+## Model & data preparation
+species_pred_wf <- workflow() |>
+    add_model(mod.boost) |>
+    add_recipe(penguin_dummies)
+## Cross-validation
+specied_pred_cv <- vfold_cv(penguins, v = 5)
+## Learning rate tuning
+lr_tuning <- tune_grid(
+    species_pred_wf,
+    resamples = specied_pred_cv,
+    grid = random_lr,
+    metrics = metric_set(bal_accuracy),
+    control = control_grid(verbose = FALSE)
+)
+lr_tuning
+```
+
+## Choosing the best parameter value
+
+- Combine the metrics from all CV runs
+- Select the learning rate to use for model training
+- Update the model & workflow
+
+```{r}
+#| code-fold: false
+#| output-location: column 
+lr_tuning |>
+    collect_metrics() |>
+    arrange(-mean) |>
+    select(learn_rate, mean, std_err)
+## Select best learning rate
+best_param <- lr_tuning |>
+    collect_metrics() |>
+    slice_max(mean)
+## Set learning rate for xgboost model
+mod.boost.best1 <- mod.boost |>
+    set_args(learn_rate = best_param$learn_rate[1])
+## Update workflow with new model
+species_pred_wf_best1 <- species_pred_wf |>
+    update_model(mod.boost.best1)
+```
+
+## Fit the final model
+
+- Fit the model and add predictions to the original data
+- Plot the confusion matrix (true vs. predicted class counts)
+
+```{r}
+#| fig-width: 6
+#| fig-height: 6
+#| fig-align: center
+#| code-fold: false
+#| output-location: column 
+library(colorspace)
+set.seed(1)
+penguins$pred <- species_pred_wf_best1 |>
+    fit(penguins) |>
+    predict(penguins) |>
+    pull(.pred_class)
+penguins |>
+    mutate(pred = as.factor(pred)) |>
+    conf_mat(species, pred) |>
+    autoplot(type = 'heatmap') +
+    scale_fill_continuous_sequential("Greens")
+```
+
+## Exercise
+
+::: {.callout-caution appearance="minimal"}
+## Avoid overfitting
+
+- In the previous example the same data was used for training and prediction
+- Implement a strategy to show that we are not overfitting
+- Hint: read the **Details** section of `?initial_split`
+:::
+
+## Solution
+
+- Set the seed to $1$
+
+```{r}
+#| fig-width: 6
+#| fig-height: 6
+#| fig-align: center
+#| echo: false
+set.seed(1)
+penguin_split <- initial_split(penguins, strata = species)
+ptrain <- training(penguin_split)
+ptest <- testing(penguin_split)
+ptest$pred <- species_pred_wf_best1 |>
+    fit(ptrain) |>
+    predict(ptest) |>
+    pull(.pred_class)
+ptest |>
+    mutate(pred = as.factor(pred)) |>
+    conf_mat(species, pred) |>
+    autoplot(type = 'heatmap') +
+    scale_fill_continuous_diverging("Purple-Green")
+```

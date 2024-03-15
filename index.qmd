@@ -11,5 +11,8 @@ This website covers the course [6235 Data Literacy (Summer 2024) at WU Vienna (l
 3. Introduction to Quarto
 4. Introduction to Git
 5. [Principles of Data Visualization](04-data_visualization.qmd)
-6. Introduction to Causal Modeling
-7. Introduction to Predictive Modeling
+6. [Introduction to Causal Modeling](05-causal_modeling.qmd)  
+   6.1. [Difference-in-Differences Estimation](06-did.qmd)
+7. [Introduction to Predictive Modeling](07-predictive_modeling.qmd)
+
+Bonus: [Notes on Logistic Regression](99_notes_logistic_regression_interpretation.qmd)
