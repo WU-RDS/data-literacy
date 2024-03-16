@@ -281,15 +281,11 @@ lr_tuning |>
     arrange(-mean) |>
     select(learn_rate, mean, std_err)
 ## Select best learning rate
-best_param <- lr_tuning |>
-    collect_metrics() |>
-    slice_max(mean)
-## Set learning rate for xgboost model
-mod.boost.best1 <- mod.boost |>
-    set_args(learn_rate = best_param$learn_rate[1])
-## Update workflow with new model
+best_lr <- lr_tuning |> select_best()
+## Set best learning rate for the model
 species_pred_wf_best1 <- species_pred_wf |>
-    update_model(mod.boost.best1)
+    finalize_workflow(best_lr)
+species_pred_wf_best1
 ```
 
 ## Fit the final model
@@ -305,8 +301,9 @@ species_pred_wf_best1 <- species_pred_wf |>
 #| output-location: column 
 library(colorspace)
 set.seed(1)
-penguins$pred <- species_pred_wf_best1 |>
-    fit(penguins) |>
+penguin_fit <- species_pred_wf_best1 |>
+    fit(penguins) 
+penguins$pred <- penguin_fit |>
     predict(penguins) |>
     pull(.pred_class)
 penguins |>
@@ -314,6 +311,21 @@ penguins |>
     conf_mat(species, pred) |>
     autoplot(type = 'heatmap') +
     scale_fill_continuous_diverging("Purple-Green")
+```
+
+## Determine variable importance
+
+```{r}
+#| fig-width: 24
+#| fig-height: 12
+#| fig-align: center
+penguin_fit |>
+    extract_fit_parsnip() |>
+    vip::vip(include_type=TRUE, type = 'gain') +
+    theme_classic() +
+    theme(
+        axis.text = element_text(size=25),
+        axis.title = element_text(size=25))
 ```
 
 ## Exercise
@@ -328,24 +340,39 @@ penguins |>
 
 ## Solution
 
-- Set the seed to $1$
 
 ```{r}
 #| fig-width: 6
 #| fig-height: 6
 #| fig-align: center
-#| echo: false
 set.seed(1)
 penguin_split <- initial_split(penguins, strata = species)
 ptrain <- training(penguin_split)
 ptest <- testing(penguin_split)
+set.seed(1)
 ptest$pred <- species_pred_wf_best1 |>
     fit(ptrain) |>
     predict(ptest) |>
     pull(.pred_class)
 ptest |>
+    bal_accuracy(species, pred)
+ptest |>
     mutate(pred = as.factor(pred)) |>
     conf_mat(species, pred) |>
     autoplot(type = 'heatmap') +
     scale_fill_continuous_diverging("Purple-Green")
+```
+
+## Alternative Solution
+
+- `last_fit` fits on the training split and evaluates on the test split
+
+```{r}
+set.seed(1)
+final_fit <- species_pred_wf_best1 |>
+    last_fit(
+        penguin_split, 
+        metrics = metric_set(bal_accuracy))
+final_fit |> 
+    collect_metrics()
 ```
